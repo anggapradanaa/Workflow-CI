@@ -37,67 +37,72 @@ def train_model(X_train, X_test, y_train, y_test):
     mlflow.set_experiment("diabetes-lgbm-ci")
     mlflow.lightgbm.autolog(log_models=True, log_input_examples=True)
 
-    print("\nMLflow tracking enabled (managed by MLflow Projects)")
-
-    model = LGBMClassifier(
-        n_estimators=500,
-        max_depth=8,
-        learning_rate=0.05,
-        num_leaves=20,
-        min_child_samples=15,
-        subsample=0.85,
-        colsample_bytree=0.95,
-        reg_alpha=0.15,
-        reg_lambda=0.1,
-        random_state=42,
-        verbose=-1
-    )
-
-    print("\nTraining LightGBM...")
-    model.fit(X_train, y_train)
-    print("Training completed!")
-
-    y_pred = model.predict(X_test)
-    y_pred_proba = model.predict_proba(X_test)[:, 1]
-
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    auc = roc_auc_score(y_test, y_pred_proba)
-
-    mlflow.log_metric("test_accuracy", accuracy)
-    mlflow.log_metric("test_precision", precision)
-    mlflow.log_metric("test_recall", recall)
-    mlflow.log_metric("test_f1_score", f1)
-    mlflow.log_metric("test_auc_roc", auc)
-
-    mlflow.log_param("ci_pipeline", "github_actions")
-    mlflow.log_param("model_type", "LightGBM")
-
-    # 🔑 PENTING: ambil run ID dari environment
+    # 🔑 Ambil run ID dari MLflow Projects
     run_id = os.environ.get("MLFLOW_RUN_ID")
+    if run_id is None:
+        raise RuntimeError("MLFLOW_RUN_ID is not set by MLflow Projects")
 
-    model_name = "diabetes-lgbm-ci-model"
-    model_uri = f"runs:/{run_id}/model"
+    print(f"\nAttaching to MLflow run ID: {run_id}")
 
-    print(f"\nRegistering model: {model_name}")
-    registered_model = mlflow.register_model(
-        model_uri=model_uri,
-        name=model_name
-    )
+    # ✅ Attach ke run yang sudah ada
+    with mlflow.start_run(run_id=run_id):
+        model = LGBMClassifier(
+            n_estimators=500,
+            max_depth=8,
+            learning_rate=0.05,
+            num_leaves=20,
+            min_child_samples=15,
+            subsample=0.85,
+            colsample_bytree=0.95,
+            reg_alpha=0.15,
+            reg_lambda=0.1,
+            random_state=42,
+            verbose=-1
+        )
 
-    os.makedirs("artifacts", exist_ok=True)
+        print("\nTraining LightGBM...")
+        model.fit(X_train, y_train)
+        print("Training completed!")
 
-    with open("artifacts/model_info.json", "w") as f:
-        json.dump({
-            "model_name": model_name,
-            "model_version": registered_model.version,
-            "run_id": run_id,
-            "model_uri": model_uri
-        }, f, indent=2)
+        y_pred = model.predict(X_test)
+        y_pred_proba = model.predict_proba(X_test)[:, 1]
 
-    return model, {}, model_name, registered_model.version
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
+        auc = roc_auc_score(y_test, y_pred_proba)
+
+        mlflow.log_metric("test_accuracy", accuracy)
+        mlflow.log_metric("test_precision", precision)
+        mlflow.log_metric("test_recall", recall)
+        mlflow.log_metric("test_f1_score", f1)
+        mlflow.log_metric("test_auc_roc", auc)
+
+        mlflow.log_param("ci_pipeline", "github_actions")
+        mlflow.log_param("model_type", "LightGBM")
+
+        # ✅ Sekarang run_id VALID
+        model_name = "diabetes-lgbm-ci-model"
+        model_uri = f"runs:/{run_id}/model"
+
+        print(f"\nRegistering model: {model_name}")
+        registered_model = mlflow.register_model(
+            model_uri=model_uri,
+            name=model_name
+        )
+
+        os.makedirs("artifacts", exist_ok=True)
+
+        with open("artifacts/model_info.json", "w") as f:
+            json.dump({
+                "model_name": model_name,
+                "model_version": registered_model.version,
+                "run_id": run_id,
+                "model_uri": model_uri
+            }, f, indent=2)
+
+        return model, {}, model_name, registered_model.version
   
 
 def main():
