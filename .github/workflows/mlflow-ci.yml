@@ -71,12 +71,10 @@ jobs:
         echo "Model Version: $MODEL_VERSION"
         echo "Run ID: $RUN_ID"
     
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-    
-    - name: Fix Docker Daemon for MLflow
+    - name: Setup Docker for MLflow
       run: |
-        sudo systemctl restart docker
+        # Use default Docker (not buildx) for MLflow compatibility
+        docker context use default
         sudo chmod 666 /var/run/docker.sock
         docker info
     
