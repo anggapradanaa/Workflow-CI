@@ -33,8 +33,6 @@ def train_model(X_train, X_test, y_train, y_test):
     print("\n" + "=" * 60)
     print("Training Model - CI/CD Pipeline")
     print("=" * 60)
-
-    mlflow.set_experiment("diabetes-lgbm-ci")
     
     # 🔑 Check if we're running inside MLflow Projects
     run_id = os.environ.get("MLFLOW_RUN_ID")
@@ -45,12 +43,14 @@ def train_model(X_train, X_test, y_train, y_test):
         print(f"  Using existing run ID: {run_id}")
         active_run = mlflow.active_run()
         if active_run is None:
-            print("  ERROR: No active run found, but MLFLOW_RUN_ID is set")
-            raise RuntimeError("Inconsistent MLflow state")
+            print("  WARNING: No active run, reattaching...")
+            mlflow.start_run(run_id=run_id)
+            active_run = mlflow.active_run()
     else:
         # ✅ Running manually - create new run
         print(f"\n✓ Running manually (not via MLflow Projects)")
-        print(f"  Creating new MLflow run...")
+        print(f"  Setting experiment and creating new run...")
+        mlflow.set_experiment("diabetes-lgbm-ci")
         mlflow.start_run()
         active_run = mlflow.active_run()
         run_id = active_run.info.run_id
