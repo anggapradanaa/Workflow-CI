@@ -79,12 +79,23 @@ jobs:
         RUN_ID="${{ steps.model_info.outputs.run_id }}"
         
         echo "Exporting model: $MODEL_NAME version $MODEL_VERSION"
+        echo "Run ID: $RUN_ID"
         
-        # Copy model artifacts from mlruns
+        # Find and copy the specific model artifacts
         mkdir -p model
-        cp -r mlruns/*/*/artifacts/model/* model/ || cp -r mlruns/*/*/$RUN_ID/artifacts/model/* model/
         
-        ls -la model/
+        # Find the exact path using run_id
+        MODEL_PATH=$(find mlruns -type d -name "$RUN_ID" | head -1)
+        echo "Found model at: $MODEL_PATH"
+        
+        if [ -d "$MODEL_PATH/artifacts/model" ]; then
+          cp -r $MODEL_PATH/artifacts/model/* model/
+          echo "✓ Model exported successfully"
+          ls -la model/
+        else
+          echo "✗ Model not found at $MODEL_PATH/artifacts/model"
+          exit 1
+        fi
       env:
         MLFLOW_TRACKING_URI: file:./mlruns
     
