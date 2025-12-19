@@ -17,10 +17,10 @@ def load_data():
     print("CI/CD Pipeline - Loading Data")
     print("=" * 60)
     
-    X_train = pd.read_csv('namadataset_preprocessing/X_train.csv')
-    X_test = pd.read_csv('namadataset_preprocessing/X_test.csv')
-    y_train = pd.read_csv('namadataset_preprocessing/y_train.csv').values.ravel()
-    y_test = pd.read_csv('namadataset_preprocessing/y_test.csv').values.ravel()
+    X_train = pd.read_csv('diabetes_preprocessing/X_train.csv')
+    X_test = pd.read_csv('diabetes_preprocessing/X_test.csv')
+    y_train = pd.read_csv('diabetes_preprocessing/y_train.csv').values.ravel()
+    y_test = pd.read_csv('diabetes_preprocessing/y_test.csv').values.ravel()
     
     print(f"Data loaded successfully!")
     print(f"  X_train: {X_train.shape}")
