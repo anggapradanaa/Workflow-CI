@@ -1,0 +1,15 @@
+artifact_uri: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/a83fa3a7a37743e7b7691823260189bc/artifacts
+end_time: 1766136872927
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a83fa3a7a37743e7b7691823260189bc
+run_name: able-flea-879
+run_uuid: a83fa3a7a37743e7b7691823260189bc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766136867697
+status: 3
+tags: []
+user_id: runner
