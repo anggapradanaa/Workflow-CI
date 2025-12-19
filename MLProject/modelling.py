@@ -34,73 +34,104 @@ def train_model(X_train, X_test, y_train, y_test):
     print("Training Model - CI/CD Pipeline")
     print("=" * 60)
 
+    # Set experiment (aman walau belum ada)
     mlflow.set_experiment("diabetes-lgbm-ci")
-    mlflow.lightgbm.autolog(log_models=True, log_input_examples=True)
 
-    # 👉 Gunakan run yang sudah dibuat oleh `mlflow run`
-with mlflow.start_run(nested=True, run_name="lgbm_ci_run") as run:
-    print("\nMLflow tracking enabled (CI)")
-    print(f"Run ID: {run.info.run_id}")
-
-    model = LGBMClassifier(
-        n_estimators=500,
-        max_depth=8,
-        learning_rate=0.05,
-        num_leaves=20,
-        min_child_samples=15,
-        subsample=0.85,
-        colsample_bytree=0.95,
-        reg_alpha=0.15,
-        reg_lambda=0.1,
-        random_state=42,
-        verbose=-1
+    # Aktifkan autolog
+    mlflow.lightgbm.autolog(
+        log_models=True,
+        log_input_examples=True
     )
+  
+    with mlflow.start_run(nested=True, run_name="lgbm_ci_run") as run:
+        print("\nMLflow tracking enabled (CI)")
+        print(f"Run ID: {run.info.run_id}")
 
-    print("\nTraining LightGBM...")
-    model.fit(X_train, y_train)
-    print("Training completed!")
+        # =========================
+        # 1. Inisialisasi model
+        # =========================
+        model = LGBMClassifier(
+            n_estimators=500,
+            max_depth=8,
+            learning_rate=0.05,
+            num_leaves=20,
+            min_child_samples=15,
+            subsample=0.85,
+            colsample_bytree=0.95,
+            reg_alpha=0.15,
+            reg_lambda=0.1,
+            random_state=42,
+            verbose=-1
+        )
 
-    y_pred = model.predict(X_test)
-    y_pred_proba = model.predict_proba(X_test)[:, 1]
+        # =========================
+        # 2. Training
+        # =========================
+        print("\nTraining LightGBM...")
+        model.fit(X_train, y_train)
+        print("Training completed!")
 
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
-    auc = roc_auc_score(y_test, y_pred_proba)
+        # =========================
+        # 3. Evaluasi
+        # =========================
+        y_pred = model.predict(X_test)
+        y_pred_proba = model.predict_proba(X_test)[:, 1]
 
-    mlflow.log_metric("test_accuracy", accuracy)
-    mlflow.log_metric("test_precision", precision)
-    mlflow.log_metric("test_recall", recall)
-    mlflow.log_metric("test_f1_score", f1)
-    mlflow.log_metric("test_auc_roc", auc)
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
+        auc = roc_auc_score(y_test, y_pred_proba)
 
-    mlflow.log_param("ci_pipeline", "github_actions")
-    mlflow.log_param("model_type", "LightGBM")
+        # =========================
+        # 4. Logging manual
+        # =========================
+        mlflow.log_metric("test_accuracy", accuracy)
+        mlflow.log_metric("test_precision", precision)
+        mlflow.log_metric("test_recall", recall)
+        mlflow.log_metric("test_f1_score", f1)
+        mlflow.log_metric("test_auc_roc", auc)
 
-    run_id = run.info.run_id
-    artifact_uri = run.info.artifact_uri
+        mlflow.log_param("ci_pipeline", "github_actions")
+        mlflow.log_param("model_type", "LightGBM")
 
-    model_name = "diabetes-lgbm-ci-model"
-    model_uri = f"runs:/{run_id}/model"
+        # =========================
+        # 5. Register model
+        # =========================
+        run_id = run.info.run_id
+        artifact_uri = run.info.artifact_uri
 
-    registered_model = mlflow.register_model(
-        model_uri=model_uri,
-        name=model_name
-    )
+        model_name = "diabetes-lgbm-ci-model"
+        model_uri = f"runs:/{run_id}/model"
 
-    os.makedirs('artifacts', exist_ok=True)
+        print(f"\nRegistering model: {model_name}")
+        registered_model = mlflow.register_model(
+            model_uri=model_uri,
+            name=model_name
+        )
 
-    with open('artifacts/model_info.json', 'w') as f:
-        json.dump({
-            'model_name': model_name,
-            'model_version': registered_model.version,
-            'run_id': run_id,
-            'artifact_uri': artifact_uri,
-            'model_uri': model_uri
-        }, f, indent=2)
+        print("Model registered successfully!")
+        print(f"  Version: {registered_model.version}")
 
-    return model, {}, model_name, registered_model.version
+        # =========================
+        # 6. Simpan info ke artifacts/
+        # =========================
+        os.makedirs("artifacts", exist_ok=True)
+
+        model_info = {
+            "model_name": model_name,
+            "model_version": registered_model.version,
+            "run_id": run_id,
+            "artifact_uri": artifact_uri,
+            "model_uri": model_uri
+        }
+
+        with open("artifacts/model_info.json", "w") as f:
+            json.dump(model_info, f, indent=2)
+
+        print("Model info saved to artifacts/model_info.json")
+
+        return model, model_info, model_name, registered_model.version
   
 
 def main():
