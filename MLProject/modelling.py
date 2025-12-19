@@ -38,7 +38,7 @@ def train_model(X_train, X_test, y_train, y_test):
     mlflow.lightgbm.autolog(log_models=True, log_input_examples=True)
 
     # 👉 Gunakan run yang sudah dibuat oleh `mlflow run`
-    run = mlflow.active_run()
+with mlflow.start_run(nested=True, run_name="lgbm_ci_run") as run:
     print("\nMLflow tracking enabled (CI)")
     print(f"Run ID: {run.info.run_id}")
 
