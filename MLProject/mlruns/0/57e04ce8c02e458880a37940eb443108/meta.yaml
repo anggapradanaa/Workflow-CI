@@ -1,0 +1,15 @@
+artifact_uri: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/57e04ce8c02e458880a37940eb443108/artifacts
+end_time: 1766137937375
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 57e04ce8c02e458880a37940eb443108
+run_name: delightful-slug-904
+run_uuid: 57e04ce8c02e458880a37940eb443108
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766137931946
+status: 3
+tags: []
+user_id: runner

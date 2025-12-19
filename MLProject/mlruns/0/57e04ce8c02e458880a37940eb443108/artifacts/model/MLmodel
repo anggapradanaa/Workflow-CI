@@ -1,0 +1,31 @@
+artifact_path: model
+flavors:
+  lightgbm:
+    code: null
+    data: model.pkl
+    lgb_version: 4.1.0
+    model_class: lightgbm.sklearn.LGBMClassifier
+  python_function:
+    data: model.pkl
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.lightgbm
+    python_version: 3.10.19
+mlflow_version: 2.8.1
+model_size_bytes: 1070668
+model_uuid: 44cb41bbccdd4a6d9cfa30e8f1247e0e
+run_id: 57e04ce8c02e458880a37940eb443108
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "Pregnancies"}, {"type": "double", "name":
+    "Glucose"}, {"type": "double", "name": "BloodPressure"}, {"type": "double", "name":
+    "SkinThickness"}, {"type": "double", "name": "Insulin"}, {"type": "double", "name":
+    "BMI"}, {"type": "double", "name": "DiabetesPedigreeFunction"}, {"type": "double",
+    "name": "Age"}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+utc_time_created: '2025-12-19 09:52:14.921326'
