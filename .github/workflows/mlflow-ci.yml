@@ -36,7 +36,7 @@ jobs:
     - name: Run MLflow Project
       run: |
         cd MLProject
-        mlflow run . --no-conda
+        mlflow run .
       env:
         MLFLOW_TRACKING_URI: file:./mlruns
     
