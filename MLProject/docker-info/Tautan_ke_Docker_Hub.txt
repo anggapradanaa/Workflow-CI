@@ -1,0 +1,66 @@
+=================================================================
+DOCKER HUB DEPLOYMENT INFO
+=================================================================
+Project: Diabetes Prediction with LightGBM
+CI/CD: GitHub Actions
+Author: Angga Yulian Adi Pradana
+Date: Fri Dec 19 09:53:30 UTC 2025
+=================================================================
+
+Docker Hub Profile:
+https://hub.docker.com/u/anggapradanaa
+
+Docker Hub Repository:
+https://hub.docker.com/r/anggapradanaa/diabetes-lgbm-model
+
+Docker Image (Latest):
+anggapradanaa/diabetes-lgbm-model:latest
+
+Docker Image (Version):
+anggapradanaa/diabetes-lgbm-model:v5
+
+=================================================================
+PULL COMMAND
+=================================================================
+
+# Pull latest version:
+docker pull anggapradanaa/diabetes-lgbm-model:latest
+
+# Pull specific version:
+docker pull anggapradanaa/diabetes-lgbm-model:v5
+
+=================================================================
+RUN COMMAND
+=================================================================
+
+# Run the model server:
+docker run -p 5001:8080 anggapradanaa/diabetes-lgbm-model:latest
+
+# Test the endpoint:
+curl http://localhost:5001/ping
+
+# With custom port:
+docker run -p 8080:8080 anggapradanaa/diabetes-lgbm-model:latest
+
+=================================================================
+MODEL INFO
+=================================================================
+
+Model Name: diabetes-lgbm-ci-model
+Model Version: 5
+MLflow Run ID: 57e04ce8c02e458880a37940eb443108
+
+=================================================================
+PREDICTION ENDPOINT
+=================================================================
+
+URL: http://localhost:5001/invocations
+Method: POST
+Content-Type: application/json
+
+Example Request:
+curl -X POST http://localhost:5001/invocations \
+  -H 'Content-Type: application/json' \
+  -d '{"inputs": [[...]]}'
+
+=================================================================
