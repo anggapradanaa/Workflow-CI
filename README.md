@@ -3,15 +3,6 @@
 ## 📁 Deskripsi Folder
 Folder ini berisi implementasi **CI/CD Pipeline** menggunakan **GitHub Actions** dan **MLflow Project** untuk otomasi training, deployment, dan containerization model machine learning.
 
-## 🎯 Achievement: **ADVANCED Level** ✅
-Memenuhi kriteria advanced dengan:
-- ✅ Workflow CI dengan GitHub Actions
-- ✅ Auto-training model saat trigger terpantik
-- ✅ Simpan artifacts ke repository GitHub
-- ✅ Build dan push Docker image ke Docker Hub
-- ✅ Auto-versioning model
-- ✅ Model serving siap production
-
 ## 📂 Struktur Folder
 ```
 Workflow-CI/
