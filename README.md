@@ -22,7 +22,6 @@ Workflow-CI/
     ├── artifacts/                     # Generated artifacts (by CI)
     │   ├── metrics.json
     │   ├── model_info.json
-    │   └── ...
     ├── diabetes_preprocessing/        # Preprocessed dataset
     │   ├── X_train.csv
     │   ├── X_test.csv
