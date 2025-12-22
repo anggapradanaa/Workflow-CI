@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
-from lightgbm import LGBMClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
                              f1_score, roc_auc_score, confusion_matrix)
 import mlflow
+import mlflow.sklearn
 import json
 import os
 import warnings
@@ -49,31 +50,27 @@ def train_model(X_train, X_test, y_train, y_test):
         # Running manually
         print(f"\n✓ Running manually (not via MLflow Projects)")
         print(f"  Setting experiment and creating new run...")
-        mlflow.set_experiment("diabetes-lgbm-ci")
+        mlflow.set_experiment("diabetes-rf-ci")
         mlflow.start_run()
         active_run = mlflow.active_run()
         run_id = active_run.info.run_id
         print(f"  Created run ID: {run_id}")
 
-    # Enable autologging
-    mlflow.autolog()
+    # Enable autologging for scikit-learn
+    mlflow.sklearn.autolog()
 
     # Train model
-    model = LGBMClassifier(
-        n_estimators=500,
-        max_depth=8,
-        learning_rate=0.05,
-        num_leaves=20,
-        min_child_samples=15,
-        subsample=0.85,
-        colsample_bytree=0.95,
-        reg_alpha=0.15,
-        reg_lambda=0.1,
+    model = RandomForestClassifier(
+        n_estimators=100,
+        max_depth=10,
+        min_samples_split=5,
+        min_samples_leaf=2,
+        max_features='sqrt',
         random_state=42,
-        verbose=-1
+        n_jobs=-1
     )
 
-    print("\nTraining LightGBM...")
+    print("\nTraining Random Forest...")
     model.fit(X_train, y_train)
     print("Training completed!")
 
@@ -95,7 +92,7 @@ def train_model(X_train, X_test, y_train, y_test):
     print(f"  AUC-ROC:   {auc:.4f}")
 
     # Register model
-    model_name = "diabetes-lgbm-ci-model"
+    model_name = "diabetes-rf-ci-model"
     model_uri = f"runs:/{run_id}/model"
 
     print(f"\n📦 Registering model: {model_name}")
@@ -141,7 +138,7 @@ def main():
     print("\n" + "=" * 60)
     print("CI/CD PIPELINE - MODEL TRAINING")
     print("=" * 60)
-    print("Project: Diabetes Prediction with LightGBM")
+    print("Project: Diabetes Prediction with Random Forest")
     print("Pipeline: GitHub Actions")
     print("=" * 60)
     
