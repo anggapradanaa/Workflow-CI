@@ -4,7 +4,7 @@ DOCKER HUB DEPLOYMENT INFO
 Project: Diabetes Prediction with Random Forest
 CI/CD: GitHub Actions
 Author: Angga Yulian Adi Pradana
-Date: Mon Dec 22 06:44:12 UTC 2025
+Date: Mon Dec 22 06:47:50 UTC 2025
 =================================================================
 
 Docker Hub Profile:
@@ -17,7 +17,7 @@ Docker Image (Latest):
 anggapradanaa/diabetes-rf-model:latest
 
 Docker Image (Version):
-anggapradanaa/diabetes-rf-model:v2
+anggapradanaa/diabetes-rf-model:v3
 
 =================================================================
 PULL COMMAND
@@ -27,7 +27,7 @@ PULL COMMAND
 docker pull anggapradanaa/diabetes-rf-model:latest
 
 # Pull specific version:
-docker pull anggapradanaa/diabetes-rf-model:v2
+docker pull anggapradanaa/diabetes-rf-model:v3
 
 =================================================================
 RUN COMMAND
@@ -47,8 +47,8 @@ MODEL INFO
 =================================================================
 
 Model Name: diabetes-rf-ci-model
-Model Version: 2
-MLflow Run ID: df529e01e5444b6a9401d2bbfc4fb39b
+Model Version: 3
+MLflow Run ID: f1e72be0acd840e19703c7a9036b50c8
 
 =================================================================
 PREDICTION ENDPOINT
