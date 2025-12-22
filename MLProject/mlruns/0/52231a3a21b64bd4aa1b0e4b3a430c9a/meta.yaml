@@ -1,0 +1,15 @@
+artifact_uri: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/52231a3a21b64bd4aa1b0e4b3a430c9a/artifacts
+end_time: 1766385607408
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 52231a3a21b64bd4aa1b0e4b3a430c9a
+run_name: learned-crab-522
+run_uuid: 52231a3a21b64bd4aa1b0e4b3a430c9a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766385599486
+status: 3
+tags: []
+user_id: runner
