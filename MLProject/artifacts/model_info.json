@@ -1,6 +1,6 @@
 {
   "model_name": "diabetes-lgbm-ci-model",
-  "model_version": 5,
-  "run_id": "57e04ce8c02e458880a37940eb443108",
-  "model_uri": "runs:/57e04ce8c02e458880a37940eb443108/model"
+  "model_version": 6,
+  "run_id": "64a8bb2e7f1e49928110b1434f213ff6",
+  "model_uri": "runs:/64a8bb2e7f1e49928110b1434f213ff6/model"
 }

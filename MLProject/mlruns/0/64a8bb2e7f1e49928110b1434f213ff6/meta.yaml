@@ -1,0 +1,15 @@
+artifact_uri: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/64a8bb2e7f1e49928110b1434f213ff6/artifacts
+end_time: 1766366108597
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 64a8bb2e7f1e49928110b1434f213ff6
+run_name: hilarious-pug-569
+run_uuid: 64a8bb2e7f1e49928110b1434f213ff6
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766366102709
+status: 3
+tags: []
+user_id: runner
