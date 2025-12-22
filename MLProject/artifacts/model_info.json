@@ -1,6 +1,6 @@
 {
   "model_name": "diabetes-rf-ci-model",
-  "model_version": 2,
-  "run_id": "df529e01e5444b6a9401d2bbfc4fb39b",
-  "model_uri": "runs:/df529e01e5444b6a9401d2bbfc4fb39b/model"
+  "model_version": 3,
+  "run_id": "f1e72be0acd840e19703c7a9036b50c8",
+  "model_uri": "runs:/f1e72be0acd840e19703c7a9036b50c8/model"
 }

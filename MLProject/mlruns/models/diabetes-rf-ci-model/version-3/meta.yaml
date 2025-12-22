@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1766386005051
+current_stage: None
+description: null
+last_updated_timestamp: 1766386005051
+name: diabetes-rf-ci-model
+run_id: f1e72be0acd840e19703c7a9036b50c8
+run_link: null
+source: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/f1e72be0acd840e19703c7a9036b50c8/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/f1e72be0acd840e19703c7a9036b50c8/artifacts/model
+user_id: null
+version: 3
