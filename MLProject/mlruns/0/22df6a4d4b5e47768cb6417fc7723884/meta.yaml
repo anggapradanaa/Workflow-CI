@@ -1,0 +1,15 @@
+artifact_uri: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/22df6a4d4b5e47768cb6417fc7723884/artifacts
+end_time: 1766384410686
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 22df6a4d4b5e47768cb6417fc7723884
+run_name: dashing-cat-319
+run_uuid: 22df6a4d4b5e47768cb6417fc7723884
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766384403303
+status: 3
+tags: []
+user_id: runner

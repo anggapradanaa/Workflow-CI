@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1766384410310
+current_stage: None
+description: null
+last_updated_timestamp: 1766384410310
+name: diabetes-lgbm-ci-model
+run_id: 22df6a4d4b5e47768cb6417fc7723884
+run_link: null
+source: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/22df6a4d4b5e47768cb6417fc7723884/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///home/runner/work/Workflow-CI/Workflow-CI/MLProject/mlruns/0/22df6a4d4b5e47768cb6417fc7723884/artifacts/model
+user_id: null
+version: 1
