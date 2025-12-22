@@ -4,7 +4,6 @@ from lightgbm import LGBMClassifier
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
                              f1_score, roc_auc_score, confusion_matrix)
 import mlflow
-import mlflow.lightgbm
 import json
 import os
 import warnings
@@ -34,11 +33,11 @@ def train_model(X_train, X_test, y_train, y_test):
     print("Training Model - CI/CD Pipeline")
     print("=" * 60)
     
-    # 🔑 Check if we're running inside MLflow Projects
+    # Check if we're running inside MLflow Projects
     run_id = os.environ.get("MLFLOW_RUN_ID")
     
     if run_id:
-        # ✅ Running via MLflow Projects - use existing run
+        # Running via MLflow Projects - use existing run
         print(f"\n✓ Running inside MLflow Projects")
         print(f"  Using existing run ID: {run_id}")
         active_run = mlflow.active_run()
@@ -47,7 +46,7 @@ def train_model(X_train, X_test, y_train, y_test):
             mlflow.start_run(run_id=run_id)
             active_run = mlflow.active_run()
     else:
-        # ✅ Running manually - create new run
+        # Running manually
         print(f"\n✓ Running manually (not via MLflow Projects)")
         print(f"  Setting experiment and creating new run...")
         mlflow.set_experiment("diabetes-lgbm-ci")
@@ -57,7 +56,7 @@ def train_model(X_train, X_test, y_train, y_test):
         print(f"  Created run ID: {run_id}")
 
     # Enable autologging
-    mlflow.lightgbm.autolog(log_models=True, log_input_examples=True)
+    mlflow.autolog()
 
     # Train model
     model = LGBMClassifier(
@@ -87,17 +86,6 @@ def train_model(X_train, X_test, y_train, y_test):
     recall = recall_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
     auc = roc_auc_score(y_test, y_pred_proba)
-
-    # Log metrics
-    mlflow.log_metric("test_accuracy", accuracy)
-    mlflow.log_metric("test_precision", precision)
-    mlflow.log_metric("test_recall", recall)
-    mlflow.log_metric("test_f1_score", f1)
-    mlflow.log_metric("test_auc_roc", auc)
-
-    # Log params
-    mlflow.log_param("ci_pipeline", "github_actions")
-    mlflow.log_param("model_type", "LightGBM")
 
     print(f"\n📊 Model Metrics:")
     print(f"  Accuracy:  {accuracy:.4f}")
@@ -145,9 +133,6 @@ def train_model(X_train, X_test, y_train, y_test):
     print(f"  - artifacts/metrics.json")
     print(f"  - artifacts/model_info.json")
 
-    # Don't end the run here - let MLflow Projects handle it
-    # If we started it manually, we'll end it in main()
-    
     return model, metrics_data, model_name, registered_model.version
   
 
@@ -184,7 +169,6 @@ def main():
         print("\n📁 Artifacts:")
         print(f"  - Saved to artifacts/ directory")
         print(f"  - MLflow run logged successfully")
-        print(f"  - Ready for Docker build")
         print("=" * 60)
         
         # End run if we started it manually
