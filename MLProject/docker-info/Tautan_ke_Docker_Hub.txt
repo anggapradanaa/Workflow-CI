@@ -4,7 +4,7 @@ DOCKER HUB DEPLOYMENT INFO
 Project: Diabetes Prediction with LightGBM
 CI/CD: GitHub Actions
 Author: Angga Yulian Adi Pradana
-Date: Mon Dec 22 01:16:22 UTC 2025
+Date: Mon Dec 22 06:21:22 UTC 2025
 =================================================================
 
 Docker Hub Profile:
@@ -17,7 +17,7 @@ Docker Image (Latest):
 anggapradanaa/diabetes-lgbm-model:latest
 
 Docker Image (Version):
-anggapradanaa/diabetes-lgbm-model:v6
+anggapradanaa/diabetes-lgbm-model:v1
 
 =================================================================
 PULL COMMAND
@@ -27,7 +27,7 @@ PULL COMMAND
 docker pull anggapradanaa/diabetes-lgbm-model:latest
 
 # Pull specific version:
-docker pull anggapradanaa/diabetes-lgbm-model:v6
+docker pull anggapradanaa/diabetes-lgbm-model:v1
 
 =================================================================
 RUN COMMAND
@@ -47,8 +47,8 @@ MODEL INFO
 =================================================================
 
 Model Name: diabetes-lgbm-ci-model
-Model Version: 6
-MLflow Run ID: 64a8bb2e7f1e49928110b1434f213ff6
+Model Version: 1
+MLflow Run ID: 22df6a4d4b5e47768cb6417fc7723884
 
 =================================================================
 PREDICTION ENDPOINT
