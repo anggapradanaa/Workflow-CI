@@ -1,4 +1,4 @@
-name: diabetes_lgbm_ci
+name: diabetes_rf_ci
 
 conda_env: conda.yaml
 
