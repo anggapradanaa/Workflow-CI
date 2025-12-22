@@ -1,7 +1,7 @@
 # Workflow CI/CD - Diabetes Prediction
 
 ## 📁 Deskripsi Folder
-Folder ini berisi implementasi **CI/CD Pipeline** menggunakan **GitHub Actions** dan **MLflow Project** untuk otomasi training, deployment, dan containerization model machine learning.
+Folder ini berisi implementasi **CI/CD Pipeline** menggunakan **GitHub Actions** dan **MLflow Project** untuk otomasi training, deployment, dan containerization model machine learning dengan **Random Forest**.
 
 ## 📂 Struktur Folder
 ```
@@ -12,7 +12,7 @@ Workflow-CI/
 └── MLProject/
     ├── artifacts/                     # Generated artifacts (by CI)
     │   ├── metrics.json
-    │   ├── model_info.json
+    │   └── model_info.json
     ├── diabetes_preprocessing/        # Preprocessed dataset
     │   ├── X_train.csv
     │   ├── X_test.csv
@@ -35,7 +35,7 @@ Workflow-CI/
 File konfigurasi MLflow Project yang mendefinisikan entry points dan environment.
 
 ```yaml
-name: diabetes_lgbm_project
+name: diabetes_rf_project
 
 conda_env: conda.yaml
 
@@ -48,7 +48,7 @@ entry_points:
 Environment dependencies untuk reproducibility.
 
 ```yaml
-name: diabetes_lgbm_env
+name: diabetes_rf_env
 channels:
   - conda-forge
   - defaults
@@ -59,14 +59,38 @@ dependencies:
       - pandas==2.0.3
       - numpy==1.24.3
       - scikit-learn==1.3.0
-      - lightgbm==4.1.0
       - mlflow==2.8.1
       - matplotlib==3.7.2
       - seaborn==0.12.2
 ```
 
 ### 3. **modelling.py**
-Script training model yang akan dijalankan oleh MLflow Project (sama dengan file di folder Membangun_model).
+Script training model yang akan dijalankan oleh MLflow Project.
+
+**Features:**
+- ✅ Load preprocessed data
+- ✅ Train Random Forest model
+- ✅ MLflow autologging enabled
+- ✅ Model registration otomatis
+- ✅ Generate artifacts (metrics.json, model_info.json)
+- ✅ Support manual & MLflow Projects run
+
+**Model Configuration:**
+```python
+RandomForestClassifier(
+    n_estimators=100,
+    max_depth=10,
+    min_samples_split=5,
+    min_samples_leaf=2,
+    max_features='sqrt',
+    random_state=42,
+    n_jobs=-1
+)
+```
+
+**Artifacts Generated:**
+- `artifacts/metrics.json` - Model performance metrics
+- `artifacts/model_info.json` - Model metadata (name, version, run_id)
 
 ## 🔄 CI/CD Workflow
 
@@ -86,24 +110,28 @@ on:
 - 📥 Pull request ke branch `main`
 - 🎯 Manual trigger (workflow_dispatch)
 
-### **Pipeline Steps** (11 Jobs)
+### **Pipeline Steps** (13 Jobs)
 
 #### 1️⃣ **Checkout Repository**
 ```bash
 - Checkout code dari GitHub
+- uses: actions/checkout@v3
 ```
 
 #### 2️⃣ **Set up Python 3.10**
 ```bash
 - Install Python 3.10
+- uses: actions/setup-python@v4
 ```
 
 #### 3️⃣ **Install Dependencies**
 ```bash
 - mlflow==2.8.1
-- pandas, numpy, scikit-learn
-- lightgbm==4.1.0
-- matplotlib, seaborn
+- pandas==2.0.3
+- numpy==1.24.3
+- scikit-learn==1.3.0
+- matplotlib==3.7.2
+- seaborn==0.12.2
 - docker
 ```
 
@@ -112,31 +140,36 @@ on:
 cd MLProject
 mlflow run . --env-manager=local
 ```
-- Training model otomatis
-- Tracking dengan MLflow
-- Generate artifacts
+- Training model otomatis dengan MLflow Project
+- Tracking dengan MLflow (file:./mlruns)
+- Generate artifacts otomatis
 
 #### 5️⃣ **List Artifacts**
 ```bash
 - Tampilkan artifacts yang dibuat
-- metrics.json
-- model_info.json
+- cat artifacts/metrics.json
+- cat artifacts/model_info.json
 ```
 
 #### 6️⃣ **Save Artifacts to Repository**
 ```bash
 - Commit artifacts ke GitHub
-- Auto-push dengan bot account
+- Auto-push dengan github-actions bot
 - Skip CI untuk commit ini ([skip ci])
 ```
 
 #### 7️⃣ **Get Model Info**
 ```bash
-- Extract model_name
-- Extract model_version
-- Extract run_id
+- Extract model_name dari model_info.json
+- Extract model_version dari model_info.json
+- Extract run_id dari model_info.json
 - Set sebagai output untuk step selanjutnya
 ```
+
+**Extracted Info:**
+- `model_name`: "diabetes-rf-ci-model"
+- `model_version`: Auto-increment version
+- `run_id`: MLflow run ID
 
 #### 8️⃣ **Export Model from MLflow**
 ```bash
@@ -145,66 +178,108 @@ mlflow run . --env-manager=local
 - Siap untuk containerization
 ```
 
+**Process:**
+```bash
+MODEL_PATH=$(find mlruns -type d -name "$RUN_ID" | head -1)
+cp -r $MODEL_PATH/artifacts/model/* model/
+```
+
 #### 9️⃣ **Create Dockerfile**
 ```dockerfile
 FROM python:3.10-slim
+
 WORKDIR /app
-RUN pip install mlflow pandas numpy scikit-learn lightgbm gunicorn flask
+
+RUN pip install --no-cache-dir \
+    mlflow==2.8.1 \
+    pandas==2.0.3 \
+    numpy==1.24.3 \
+    scikit-learn==1.3.0 \
+    gunicorn \
+    flask
+
 COPY model /app/model
+
 EXPOSE 8080
+
 CMD mlflow models serve -m /app/model -h 0.0.0.0 -p 8080 --no-conda
 ```
 
-#### 🔟 **Build and Push Docker Image**
+#### 🔟 **Login to Docker Hub**
 ```bash
-- Login ke Docker Hub
-- Build image: anggapradanaa/diabetes-lgbm-model
+- Authenticate dengan Docker Hub
+- uses: docker/login-action@v2
+- Menggunakan secrets: DOCKER_USERNAME & DOCKER_PASSWORD
+```
+
+#### 1️⃣1️⃣ **Build and Push Docker Image**
+```bash
+- Build Docker image
 - Tag: latest & v{version}
 - Push kedua tags ke Docker Hub
 ```
 
-#### 1️⃣1️⃣ **Create Docker Hub Link File**
+**Images Created:**
+```bash
+anggapradanaa/diabetes-rf-model:latest
+anggapradanaa/diabetes-rf-model:v{version}
+```
+
+#### 1️⃣2️⃣ **Create Docker Hub Link File**
 ```bash
 - Generate Tautan_ke_Docker_Hub.txt
-- Berisi: Docker Hub links, pull commands, run commands
-- Info model dan prediction endpoint
+- Berisi:
+  * Docker Hub links
+  * Pull commands
+  * Run commands
+  * Model info
+  * Prediction endpoint examples
+```
+
+#### 1️⃣3️⃣ **Commit Docker Info**
+```bash
+- Commit docker-info/ ke repository
+- Auto-push dengan github-actions bot
+- Message: "🐳 CI: Add Docker Hub deployment info [skip ci]"
 ```
 
 #### **Additional Steps:**
-- 📤 Upload artifacts ke GitHub Actions
-- 📝 Commit docker-info ke repository
-- 📊 Print summary
+- 📤 **Upload Artifacts to GitHub** - Store artifacts di GitHub Actions
+- 📊 **Summary** - Print comprehensive pipeline summary
 
 ## 🐳 Docker Deployment
 
 ### **Docker Hub Repository**
 ```
-https://hub.docker.com/r/anggapradanaa/diabetes-lgbm-model
+https://hub.docker.com/r/anggapradanaa/diabetes-rf-model
 ```
 
 ### **Pull Docker Image**
 ```bash
 # Latest version
-docker pull anggapradanaa/diabetes-lgbm-model:latest
+docker pull anggapradanaa/diabetes-rf-model:latest
 
 # Specific version
-docker pull anggapradanaa/diabetes-lgbm-model:v{version}
+docker pull anggapradanaa/diabetes-rf-model:v{version}
 ```
 
 ### **Run Docker Container**
 ```bash
-# Run model server
-docker run -p 5001:8080 anggapradanaa/diabetes-lgbm-model:latest
+# Run model server (port 5001)
+docker run -p 5001:8080 anggapradanaa/diabetes-rf-model:latest
 
 # Test endpoint
 curl http://localhost:5001/ping
 
-# With custom port
-docker run -p 8080:8080 anggapradanaa/diabetes-lgbm-model:latest
+# With custom port (8080)
+docker run -p 8080:8080 anggapradanaa/diabetes-rf-model:latest
 ```
 
 ### **Prediction Endpoint**
 ```bash
+# Health check
+curl http://localhost:5001/ping
+
 # Make prediction
 curl -X POST http://localhost:5001/invocations \
   -H 'Content-Type: application/json' \
@@ -215,19 +290,45 @@ curl -X POST http://localhost:5001/invocations \
   }'
 ```
 
+**Response Example:**
+```json
+{
+  "predictions": [1]  // 0 = No Diabetes, 1 = Diabetes
+}
+```
+
 ## 🎯 Outputs & Artifacts
 
-### **Artifacts Generated:**
-1. **metrics.json** - Model metrics (accuracy, precision, recall, etc.)
-2. **model_info.json** - Model metadata (name, version, run_id)
-3. **model/** - Exported MLflow model
-4. **mlruns/** - MLflow tracking data
-5. **Dockerfile** - Container configuration
-6. **Tautan_ke_Docker_Hub.txt** - Docker deployment info
+### **Artifacts Generated by Pipeline:**
+1. **metrics.json** - Model performance metrics
+   ```json
+   {
+     "accuracy": 0.7273,
+     "precision": 0.6234,
+     "recall": 0.7123,
+     "f1_score": 0.6645,
+     "auc_roc": 0.8234
+   }
+   ```
 
-### **Artifact Storage:**
+2. **model_info.json** - Model metadata
+   ```json
+   {
+     "model_name": "diabetes-rf-ci-model",
+     "model_version": "4",
+     "run_id": "ed98e1ebe8094e9db6a0b6dc6229dbb6",
+     "model_uri": "runs:/{run_id}/model"
+   }
+   ```
+
+3. **model/** - Exported MLflow model (MLmodel, model.pkl, requirements.txt)
+4. **mlruns/** - MLflow tracking data
+5. **Dockerfile** - Auto-generated container configuration
+6. **Tautan_ke_Docker_Hub.txt** - Docker deployment info & commands
+
+### **Artifact Storage Locations:**
 - ✅ **GitHub Repository** - Auto-commit ke `MLProject/artifacts/` dan `MLProject/docker-info/`
-- ✅ **GitHub Actions** - Available di tab "Artifacts" setiap workflow run
+- ✅ **GitHub Actions** - Available di tab "Artifacts" setiap workflow run (60-90 days retention)
 - ✅ **Docker Hub** - Container images dengan versioning
 
 ## 📊 Workflow Monitoring
@@ -237,14 +338,27 @@ curl -X POST http://localhost:5001/invocations \
 GitHub Repository → Actions → MLflow CI/CD Pipeline
 ```
 
+**Features:**
+- Real-time logs untuk setiap step
+- Artifact downloads
+- Re-run failed workflows
+- Workflow status & duration
+
 ### **Check Docker Images:**
 ```
-https://hub.docker.com/r/anggapradanaa/diabetes-lgbm-model/tags
+https://hub.docker.com/r/anggapradanaa/diabetes-rf-model/tags
+```
+
+### **MLflow Tracking:**
+```bash
+cd MLProject
+mlflow ui
+# Access at http://localhost:5000
 ```
 
 ### **Workflow Status Badge:**
 ```markdown
-![MLflow CI/CD](https://github.com/[username]/[repo]/actions/workflows/mlflow-ci.yml/badge.svg)
+![MLflow CI/CD](https://github.com/anggapradanaa/Membangun_model/actions/workflows/mlflow-ci.yml/badge.svg)
 ```
 
 ## 🚀 Manual Trigger
@@ -254,9 +368,9 @@ Untuk menjalankan workflow secara manual:
 1. Buka repository di GitHub
 2. Navigasi ke **Actions** tab
 3. Pilih **MLflow CI/CD Pipeline**
-4. Klik **Run workflow**
+4. Klik **Run workflow** (button)
 5. Pilih branch `main`
-6. Klik **Run workflow** hijau
+6. Klik **Run workflow** (hijau)
 
 ## 🔐 Required Secrets
 
@@ -266,39 +380,127 @@ Untuk Docker Hub deployment, tambahkan secrets di GitHub:
 Settings → Secrets and variables → Actions → New repository secret
 ```
 
-**Secrets:**
-- `DOCKER_USERNAME` - Username Docker Hub
-- `DOCKER_PASSWORD` - Password/Token Docker Hub
+**Required Secrets:**
+- `DOCKER_USERNAME` - Username Docker Hub Anda
+- `DOCKER_PASSWORD` - Password atau Personal Access Token Docker Hub
+
+**Cara Membuat Docker Hub Token:**
+1. Login ke Docker Hub
+2. Account Settings → Security → New Access Token
+3. Copy token dan paste sebagai `DOCKER_PASSWORD`
 
 ## ✅ Success Criteria
 
 Pipeline dianggap sukses jika:
-- ✅ Model trained successfully
-- ✅ Artifacts generated dan tersimpan
-- ✅ Docker image built dan pushed ke Docker Hub
+- ✅ Model trained successfully dengan Random Forest
+- ✅ Artifacts generated (metrics.json, model_info.json)
+- ✅ Model registered di MLflow
+- ✅ Docker image built successfully
+- ✅ Docker image pushed ke Docker Hub (2 tags)
 - ✅ Tautan_ke_Docker_Hub.txt dibuat
-- ✅ Semua jobs completed tanpa error
+- ✅ Artifacts auto-committed ke repository
+- ✅ Semua 13 jobs completed tanpa error
 
-## 📝 Notes
+## 🎯 Expected Model Performance
 
-### **Auto-commit Message:**
+Berdasarkan training dengan Random Forest (n_estimators=100, max_depth=10):
+
+| Metric | Expected Range |
+|--------|----------------|
+| Accuracy | 0.72 - 0.76 |
+| Precision | 0.60 - 0.70 |
+| Recall | 0.70 - 0.75 |
+| F1-Score | 0.65 - 0.72 |
+| AUC-ROC | 0.80 - 0.85 |
+
+## 📝 Important Notes
+
+### **Auto-commit Messages:**
 - `🤖 CI: Auto-save model artifacts [skip ci]`
 - `🐳 CI: Add Docker Hub deployment info [skip ci]`
 
-**[skip ci]** mencegah infinite loop (commit → trigger workflow → commit → ...)
+**[skip ci]** mencegah infinite loop:
+```
+commit → trigger workflow → new commit → trigger workflow → ...
+```
 
 ### **Reproducibility:**
-- Environment terdefinisi di `conda.yaml`
-- MLflow tracking untuk experiment management
-- Docker untuk deployment consistency
+- ✅ Environment terdefinisi di `conda.yaml`
+- ✅ MLflow tracking untuk experiment management
+- ✅ Docker untuk deployment consistency
+- ✅ Fixed random_state=42 untuk reproducible results
 
-### **Versioning:**
-- Model version auto-increment
-- Docker images tagged dengan version
-- Semua artifacts tracked di MLflow
+### **Versioning Strategy:**
+- Model version auto-increment di MLflow
+- Docker images tagged dengan version number
+- Semua artifacts tracked dengan run_id
+- Git commits untuk audit trail
+
+### **Error Handling:**
+- `continue-on-error: true` untuk git push steps
+- Prevents pipeline failure jika tidak ada changes
+- Full error logs available di GitHub Actions
+
+## 🔧 Troubleshooting
+
+### **Pipeline Fails at "Run MLflow Project"**
+```bash
+# Check if data exists
+ls -la MLProject/diabetes_preprocessing/
+
+# Verify conda.yaml dependencies
+cat MLProject/conda.yaml
+```
+
+### **Docker Push Fails**
+```bash
+# Verify secrets are set
+Settings → Secrets → DOCKER_USERNAME & DOCKER_PASSWORD
+
+# Check Docker Hub login
+docker login -u YOUR_USERNAME
+```
+
+### **Model Not Found Error**
+```bash
+# Check if model was logged
+ls -la MLProject/mlruns/
+
+# Verify run_id exists
+cat MLProject/artifacts/model_info.json
+```
+
+## 📚 Local Development
+
+### **Run MLflow Project Locally:**
+```bash
+cd MLProject
+mlflow run . --env-manager=local
+```
+
+### **View MLflow UI:**
+```bash
+cd MLProject
+mlflow ui
+# Access at http://localhost:5000
+```
+
+### **Test Docker Image Locally:**
+```bash
+# Build
+docker build -t diabetes-rf-model:test .
+
+# Run
+docker run -p 5001:8080 diabetes-rf-model:test
+
+# Test
+curl http://localhost:5001/ping
+```
 
 ---
 
 **Author**: Angga Yulian Adi Pradana  
+**Model**: Random Forest Classifier  
 **CI/CD**: GitHub Actions + MLflow Project  
 **Container**: Docker Hub  
+**Experiment Tracking**: MLflow
