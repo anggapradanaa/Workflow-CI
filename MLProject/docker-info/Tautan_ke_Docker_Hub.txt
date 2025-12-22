@@ -1,54 +1,54 @@
 =================================================================
 DOCKER HUB DEPLOYMENT INFO
 =================================================================
-Project: Diabetes Prediction with LightGBM
+Project: Diabetes Prediction with Random Forest
 CI/CD: GitHub Actions
 Author: Angga Yulian Adi Pradana
-Date: Mon Dec 22 06:21:22 UTC 2025
+Date: Mon Dec 22 06:41:13 UTC 2025
 =================================================================
 
 Docker Hub Profile:
 https://hub.docker.com/u/anggapradanaa
 
 Docker Hub Repository:
-https://hub.docker.com/r/anggapradanaa/diabetes-lgbm-model
+https://hub.docker.com/r/anggapradanaa/diabetes-rf-model
 
 Docker Image (Latest):
-anggapradanaa/diabetes-lgbm-model:latest
+anggapradanaa/diabetes-rf-model:latest
 
 Docker Image (Version):
-anggapradanaa/diabetes-lgbm-model:v1
+anggapradanaa/diabetes-rf-model:v1
 
 =================================================================
 PULL COMMAND
 =================================================================
 
 # Pull latest version:
-docker pull anggapradanaa/diabetes-lgbm-model:latest
+docker pull anggapradanaa/diabetes-rf-model:latest
 
 # Pull specific version:
-docker pull anggapradanaa/diabetes-lgbm-model:v1
+docker pull anggapradanaa/diabetes-rf-model:v1
 
 =================================================================
 RUN COMMAND
 =================================================================
 
 # Run the model server:
-docker run -p 5001:8080 anggapradanaa/diabetes-lgbm-model:latest
+docker run -p 5001:8080 anggapradanaa/diabetes-rf-model:latest
 
 # Test the endpoint:
 curl http://localhost:5001/ping
 
 # With custom port:
-docker run -p 8080:8080 anggapradanaa/diabetes-lgbm-model:latest
+docker run -p 8080:8080 anggapradanaa/diabetes-rf-model:latest
 
 =================================================================
 MODEL INFO
 =================================================================
 
-Model Name: diabetes-lgbm-ci-model
+Model Name: diabetes-rf-ci-model
 Model Version: 1
-MLflow Run ID: 22df6a4d4b5e47768cb6417fc7723884
+MLflow Run ID: 52231a3a21b64bd4aa1b0e4b3a430c9a
 
 =================================================================
 PREDICTION ENDPOINT
